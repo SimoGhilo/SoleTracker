@@ -1,7 +1,7 @@
 # --- Dependencies ---
 node_modules/
 client/node_modules/
-server/node_modules/
+api/node_modules/
 .pnp
 .pnp.js
 
@@ -9,7 +9,7 @@ server/node_modules/
 dist/
 build/
 client/dist/
-server/dist/
+api/dist/
 *.tsbuildinfo
 
 # --- Environment variables ---
@@ -18,8 +18,8 @@ server/dist/
 .env.*.local
 client/.env
 client/.env.local
-server/.env
-server/.env.local
+api/.env
+api/.env.local
 
 # --- Logs ---
 logs/
@@ -38,8 +38,8 @@ client/*.local
 Thumbs.db
 
 # --- Uploaded files (receipts etc.) if stored locally in dev ---
-server/uploads/
-server/tmp/
+api/uploads/
+api/tmp/
 
 # --- Package manager artifacts ---
 .npm/
