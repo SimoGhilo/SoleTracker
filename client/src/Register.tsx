@@ -1,5 +1,7 @@
 //Dependencies
 import { useState, useEffect } from "react";
+//Types 
+import type {User} from './types.ts';
 
 export default function Register() {
   
@@ -11,6 +13,8 @@ export default function Register() {
   const [passwordConfirm, setPasswordConfirm] = useState<string>("");
   const [errorUI, setErrorUI] = useState<Boolean | null | undefined>(null);
   const [errorMessageUI, setErrorMessageUI] = useState<string []>([]);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [errorServer, setErrorServer] = useState<boolean>(false);
 
   //Handlers & validators
   function validateEmail(e : string) {
@@ -45,7 +49,7 @@ export default function Register() {
         setErrorUI(true);
     }
     if(pass == "" || !validatePassword(pass)) {
-        setErrorMessageUI(prev => [...prev, "Please enter a valid password."]);
+        setErrorMessageUI(prev => [...prev, "Please enter a valid password of length 10, that contains an uppercase character and a symbol."]);
         setErrorUI(true);
     }
     if(pass != con) {
@@ -54,13 +58,47 @@ export default function Register() {
     }
   }
 
+  function submitForm(e : React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    if(errorUI) return;
+    const user : User = {
+      business_name: businessName,
+      email: email,
+      password: password
+    }
+    //DO API call
+
+    const response: Promise<Response> = fetch('http://localhost:5000/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    })
+
+    //TODO: MySQL error when trying to register
+    response.then((r) => {
+      if(r.status == 201){
+        setSuccess(true)
+      } else {
+        //400
+        setErrorServer(true);
+      }
+    }).catch((e) => {
+      //500
+        setErrorServer(true);
+    })
+
+
+  }
+
   //Hooks
   useEffect(() => {
     setErrorMessageUI([]);
     checkForm(businessName,email,password,passwordConfirm);
   },[businessName,email,password,passwordConfirm]);
 
-  //UI data validation done, do type user for API
+  
 
 
   return (
@@ -80,7 +118,7 @@ export default function Register() {
           </p>
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={(e) => submitForm(e)}>
           <div>
             <label
               htmlFor="business_name"
@@ -175,9 +213,61 @@ export default function Register() {
         </div>
         )}
 
+        {errorServer && (
+        <div className="mb-6 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+            <svg
+            className="h-5 w-5 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            >
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+            </svg>
+            
+            <p className="text-sm font-medium">Something went wrong, please try again.</p>
+        </div>
+        )}
+
+
+        {success && (
+          <div className="mb-6 flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+            <svg
+              className="h-5 w-5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+
+            <div>
+              <p className="font-medium">Account created successfully!</p>
+              <p className="text-sm text-green-600">
+                You can now sign in using your email and password.
+              </p>
+            </div>
+          </div>
+        )}
+
           <button
+            disabled={errorUI ? true : false}
             type="submit"
-            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
+          className={`w-full rounded-lg py-3 font-semibold text-white transition active:scale-[0.98]
+            ${
+              errorUI
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 hover:cursor-pointer"
+            }`}
           >
             Create Account
           </button>
