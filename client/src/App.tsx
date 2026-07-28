@@ -1,13 +1,19 @@
-import { useState } from 'react'
-
+//Dependecies
+import { Routes, Route } from "react-router-dom";
+//Components
+import Login from "./Login";
+import Register from "./Register";
 
 function App() {
 
-  /**TODO: I have the router installed, do components */
+  /**TODO: Do dashboard*/
 
   return (
     <>
-      <h1>Test</h1>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+    </Routes>
     </>
   )
 }
